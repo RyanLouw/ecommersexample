@@ -1,0 +1,22 @@
+services:
+  voltcart:
+    build: .
+    environment:
+      PORT: 3001
+      DATABASE_PATH: /app/data/store.db
+      SEED_DATABASE: ${SEED_DATABASE:-false}
+      STORE_URL: ${STORE_URL:-http://localhost:8080}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+    volumes:
+      - store_data:/app/data
+    ports:
+      - "8080:3001"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3001/api/health').then(r=>{if(!r.ok)process.exit(1)})"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  store_data:
